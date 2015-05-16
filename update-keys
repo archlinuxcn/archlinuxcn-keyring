@@ -5,8 +5,8 @@ export LANG=C
 TMPDIR=$(mktemp -d)
 trap "rm -rf '${TMPDIR}'" EXIT
 
-#KEYSERVER='hkp://pool.sks-keyservers.net'
-KEYSERVER='hkp://pgp.mit.edu'
+KEYSERVER='hkp://pool.sks-keyservers.net'
+#KEYSERVER='hkp://pgp.mit.edu'
 GPG="gpg --quiet --batch --no-tty --no-permission-warning --keyserver "${KEYSERVER}" --homedir ${TMPDIR}"
 
 pushd "$(dirname "$0")" >/dev/null
@@ -19,6 +19,7 @@ Key-Usage: sign
 Name-Real: Arch Linux CN Keyring Keychain Master Key
 Name-Email: archlinuxcn-keyring@localhost
 Expire-Date: 0
+%no-protection
 %commit
 %echo Done
 EOF
