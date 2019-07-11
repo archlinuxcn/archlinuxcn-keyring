@@ -6,11 +6,11 @@ TMPDIR=$(mktemp -d)
 trap "rm -rf '${TMPDIR}'" EXIT
 
 #KEYSERVER='hkp://pgp.ustc.edu.cn'
-KEYSERVER='hkp://pool.sks-keyservers.net'
+#KEYSERVER='hkp://pool.sks-keyservers.net'
 #KEYSERVER='hkp://pgp.mit.edu'
 #KEYSERVER='hkp://keys.gnupg.net'
 #KEYSERVER='hkp://pgp.nic.ad.jp'
-#KEYSERVER='hkp://hkps.pool.sks-keyservers.net'
+KEYSERVER='hkp://hkps.pool.sks-keyservers.net'
 #KEYSERVER='hkp://keyserver.ubuntu.com'
 
 GPG="gpg --quiet --batch --no-tty --no-permission-warning --keyserver "${KEYSERVER}" --homedir ${TMPDIR}"
