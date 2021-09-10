@@ -6,15 +6,16 @@ TMPDIR=$(mktemp -d)
 trap "rm -rf '${TMPDIR}'" EXIT
 
 #KEYSERVER='hkp://pgp.ustc.edu.cn'
-#KEYSERVER='hkp://pool.sks-keyservers.net'
+#KEYSERVER='hkps://pool.sks-keyservers.net'
 #KEYSERVER='hkp://pgp.mit.edu'
-KEYSERVER='hkp://keys.gnupg.net'
+#KEYSERVER='hkp://keys.gnupg.net'
+#KEYSERVER='hkps://keys.openpgp.org'
 #KEYSERVER='hkp://pgp.nic.ad.jp'
 #KEYSERVER='hkps://keys.mailvelope.com'
 #KEYSERVER='hkp://hkps.pool.sks-keyservers.net'
 #KEYSERVER='hkp://keyserver.ubuntu.com'
 
-GPG="gpg --quiet --batch --no-tty --no-permission-warning --keyserver "${KEYSERVER}" --homedir ${TMPDIR}"
+GPG="gpg --quiet --batch --no-tty --no-permission-warning --homedir ${TMPDIR}"
 
 pushd "$(dirname "$0")" >/dev/null
 
@@ -36,8 +37,10 @@ mkdir master packager packager-revoked
 
 while read -ra data; do
 	keyid="${data[0]}"
-	username="${data[@]:1}"
-	${GPG} --recv-keys ${keyid} &>/dev/null
+	username="${data[1]}"
+	keyserver="${data[2]}"
+	echo "Recv '${keyid}' of '${username}' from '${keyserver}'"
+	${GPG} --keyserver ${keyserver} --recv-keys ${keyid} &>/dev/null
 	printf 'minimize\nquit\ny\n' | \
 		${GPG} --command-fd 0 --edit-key ${keyid}
 	${GPG} --yes --lsign-key ${keyid} &>/dev/null
@@ -48,11 +51,12 @@ ${GPG} --import-ownertrust < archlinuxcn-trusted 2>/dev/null
 
 while read -ra data; do
 	keyid="${data[0]}"
-	${GPG} --recv-keys ${keyid} &>/dev/null
+	keyserver="${data[2]}"
+	${GPG} --keyserver ${keyserver} --recv-keys ${keyid} &>/dev/null
 done < packager-keyids
 while read -ra data; do
 	keyid="${data[0]}"
-	username="${data[@]:1}"
+	username="${data[1]}"
 	printf 'clean\nquit\ny\n' | \
 		${GPG} --command-fd 0 --edit-key ${keyid}
 	if ! ${GPG} --list-keys --with-colons ${keyid} 2>/dev/null | grep -q '^pub:f:'; then
@@ -65,7 +69,9 @@ done < packager-keyids
 while read -ra data; do
 	keyid="${data[0]}"
 	username="${data[1]}"
-	${GPG} --recv-keys ${keyid} &>/dev/null
+	keyserver="${data[2]}"
+	echo "Recv '${keyid}' of '${username}' from '${keyserver}'"
+	${GPG} --keyserver ${keyserver} --recv-keys ${keyid} &>/dev/null
 	printf 'clean\nquit\ny\n' | \
 		${GPG} --command-fd 0 --edit-key ${keyid}
 	if ! ${GPG} --list-keys --with-colons ${keyid} 2>/dev/null | grep -q '^pub:f:'; then
